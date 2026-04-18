@@ -1,0 +1,27 @@
+services:
+  mysql:
+    image: mysql:8.0
+    ports:
+      - '3307:3306'
+    environment:
+      MYSQL_ROOT_PASSWORD: prisma
+      MYSQL_DATABASE: prisma_sql_logger_test
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  postgres:
+    image: postgres:16
+    ports:
+      - '5433:5432'
+    environment:
+      POSTGRES_USER: prisma
+      POSTGRES_PASSWORD: prisma
+      POSTGRES_DB: prisma_sql_logger_test
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U prisma']
+      interval: 5s
+      timeout: 5s
+      retries: 10

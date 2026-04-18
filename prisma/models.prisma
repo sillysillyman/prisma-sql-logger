@@ -1,0 +1,75 @@
+/// Test model covering all major column types.
+model TypeTest {
+  id       Int      @id @default(autoincrement())
+  str      String   @db.VarChar(255)
+  text     String   @db.Text
+  num      Int
+  float    Float
+  big      BigInt
+  bool     Boolean
+  date     DateTime
+  bytes    Bytes
+  json     Json
+  optional String?  @db.VarChar(255)
+}
+
+// ─── Northwind-inspired models for relation query testing ───
+
+model Customer {
+  id      Int     @id @default(autoincrement())
+  name    String  @db.VarChar(255)
+  email   String  @unique @db.VarChar(255)
+  orders  Order[]
+}
+
+model Employee {
+  id        Int              @id @default(autoincrement())
+  firstName String           @db.VarChar(100)
+  lastName  String           @db.VarChar(100)
+  hireDate  DateTime
+  profile   EmployeeProfile?
+  orders    Order[]
+}
+
+model EmployeeProfile {
+  id         Int      @id @default(autoincrement())
+  phone      String?  @db.VarChar(50)
+  address    String?  @db.VarChar(255)
+  employee   Employee @relation(fields: [employeeId], references: [id])
+  employeeId Int      @unique
+}
+
+model Category {
+  id       Int       @id @default(autoincrement())
+  name     String    @unique @db.VarChar(100)
+  products Product[]
+}
+
+model Product {
+  id           Int           @id @default(autoincrement())
+  name         String        @db.VarChar(255)
+  unitPrice    Float
+  category     Category      @relation(fields: [categoryId], references: [id])
+  categoryId   Int
+  orderDetails OrderDetail[]
+}
+
+model Order {
+  id           Int           @id @default(autoincrement())
+  orderDate    DateTime      @default(now())
+  customer     Customer      @relation(fields: [customerId], references: [id])
+  customerId   Int
+  employee     Employee      @relation(fields: [employeeId], references: [id])
+  employeeId   Int
+  orderDetails OrderDetail[]
+}
+
+model OrderDetail {
+  id        Int     @id @default(autoincrement())
+  quantity  Int
+  discount  Float   @default(0)
+  order     Order   @relation(fields: [orderId], references: [id])
+  orderId   Int
+  product   Product @relation(fields: [productId], references: [id])
+  productId Int
+}
