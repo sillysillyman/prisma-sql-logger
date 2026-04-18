@@ -49,7 +49,7 @@
     "test": "vitest run --exclude 'tests/**'",
     "test:watch": "vitest --exclude 'tests/**'",
     "test:integration": "vitest run --config vitest.integration.config.ts",
-    "test:setup": "bash scripts/setup-test-db.sh",
+    "test:setup": "tsx scripts/setup-test-db.ts",
     "generate:schema": "tsx scripts/generate-schema.ts",
     "lint": "eslint src",
     "format": "prettier --write .",
