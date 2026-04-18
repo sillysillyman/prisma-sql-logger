@@ -16,10 +16,10 @@ model TypeTest {
 // ─── Northwind-inspired models for relation query testing ───
 
 model Customer {
-  id      Int     @id @default(autoincrement())
-  name    String  @db.VarChar(255)
-  email   String  @unique @db.VarChar(255)
-  orders  Order[]
+  id     Int     @id @default(autoincrement())
+  name   String  @db.VarChar(255)
+  email  String  @unique @db.VarChar(255)
+  orders Order[]
 }
 
 model Employee {

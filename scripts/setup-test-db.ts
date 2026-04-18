@@ -4,11 +4,13 @@
  * Usage: npx tsx scripts/setup-test-db.ts
  *
  * 1. Create .env from .env.example (if not exists)
- * 2. Start Docker containers
+ * 2. Start Docker containers (MySQL + PostgreSQL)
  * 3. Wait for databases to be ready
- * 4. Generate dialect-specific Prisma schemas
- * 5. Push schemas to databases
- * 6. Generate Prisma Client
+ * 4. For each dialect:
+ *    - Generate prisma/schema.prisma
+ *    - prisma db push
+ * 5. Regenerate schema for the default dialect (MySQL) and run prisma generate
+ *    so the Prisma Client is usable after setup.
  */
 import { execSync } from 'node:child_process';
 import { existsSync, copyFileSync } from 'node:fs';
@@ -40,7 +42,7 @@ if (!existsSync(resolve(ROOT, '.env'))) {
   copyFileSync(resolve(ROOT, '.env.example'), resolve(ROOT, '.env'));
 }
 
-// 2. Start Docker containers
+// 2. Start containers
 console.log('Starting database containers...');
 run('docker compose up -d');
 
@@ -57,19 +59,17 @@ while (!runSilent('docker compose exec postgres pg_isready -U prisma -q')) {
 }
 console.log('PostgreSQL is ready.');
 
-// 4. Generate schemas
-console.log('Generating Prisma schemas...');
-run('npx tsx scripts/generate-schema.ts');
+// 4. Push schema for each dialect (multi-file schema: --schema prisma)
+const dialects = ['mysql', 'postgresql'] as const;
+for (const dialect of dialects) {
+  console.log(`\n--- ${dialect} ---`);
+  run(`npx tsx scripts/generate-schema.ts ${dialect}`);
+  run('npx prisma db push --schema prisma --skip-generate');
+}
 
-// 5. Push to databases
-console.log('Pushing schema to MySQL...');
-run('npx prisma db push --schema prisma/generated/mysql.prisma --skip-generate');
-
-console.log('Pushing schema to PostgreSQL...');
-run('npx prisma db push --schema prisma/generated/postgresql.prisma --skip-generate');
-
-// 6. Generate Prisma Client
-console.log('Generating Prisma Client...');
-run('npx prisma generate --schema prisma/generated/mysql.prisma');
+// 5. Leave schema as MySQL (default) and generate Prisma Client
+console.log('\n--- Finalizing ---');
+run('npx tsx scripts/generate-schema.ts mysql');
+run('npx prisma generate --schema prisma');
 
 console.log("\nDone! Run 'npm run test:integration' to execute tests.");
