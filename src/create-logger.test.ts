@@ -2,8 +2,11 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { createPrismaSqlLogger } from './create-logger.js';
 import type { QueryEvent } from './types.js';
 
+const FIXED_TIMESTAMP = new Date('2026-04-08T12:34:56.789Z');
+
 function makeEvent(overrides: Partial<QueryEvent> = {}): QueryEvent {
   return {
+    timestamp: FIXED_TIMESTAMP,
     query: 'SELECT 1',
     params: '[]',
     duration: 1,
@@ -151,7 +154,10 @@ describe('createPrismaSqlLogger', () => {
 
       log(makeEvent({ query: 'SELECT ?', params: '[42]', duration: 5 }));
 
-      expect(logger).toHaveBeenCalledWith('SELECT 42', { duration: 5 });
+      expect(logger).toHaveBeenCalledWith('SELECT 42', {
+        timestamp: FIXED_TIMESTAMP,
+        duration: 5,
+      });
     });
 
     it('is called once per event', () => {
@@ -175,7 +181,23 @@ describe('createPrismaSqlLogger', () => {
       log(makeEvent({ query: 'SELECT ?', params: '[1]', duration: 10 }));
 
       // SQL should not contain the duration prefix
-      expect(logger).toHaveBeenCalledWith('SELECT 1', { duration: 10 });
+      expect(logger).toHaveBeenCalledWith('SELECT 1', {
+        timestamp: FIXED_TIMESTAMP,
+        duration: 10,
+      });
+    });
+
+    it('passes through the original event timestamp', () => {
+      const logger = vi.fn();
+      const customTimestamp = new Date('2030-01-01T00:00:00Z');
+      const log = createPrismaSqlLogger({ dialect: 'mysql', logger });
+
+      log(makeEvent({ timestamp: customTimestamp }));
+
+      expect(logger).toHaveBeenCalledWith(
+        'SELECT 1',
+        expect.objectContaining({ timestamp: customTimestamp }),
+      );
     });
   });
 
@@ -186,7 +208,10 @@ describe('createPrismaSqlLogger', () => {
 
       log(makeEvent({ query: 'BEGIN', params: '[]' }));
 
-      expect(logger).toHaveBeenCalledWith('BEGIN', { duration: 1 });
+      expect(logger).toHaveBeenCalledWith('BEGIN', {
+        timestamp: FIXED_TIMESTAMP,
+        duration: 1,
+      });
     });
 
     it('passes COMMIT through', () => {
@@ -195,7 +220,10 @@ describe('createPrismaSqlLogger', () => {
 
       log(makeEvent({ query: 'COMMIT', params: '[]' }));
 
-      expect(logger).toHaveBeenCalledWith('COMMIT', { duration: 1 });
+      expect(logger).toHaveBeenCalledWith('COMMIT', {
+        timestamp: FIXED_TIMESTAMP,
+        duration: 1,
+      });
     });
   });
 });

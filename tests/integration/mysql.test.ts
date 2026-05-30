@@ -9,7 +9,12 @@ interface QueryEvent {
   duration: number;
 }
 
-let prisma: PrismaClient;
+const createPrisma = () =>
+  new PrismaClient({
+    log: [{ emit: 'event', level: 'query' }],
+  });
+
+let prisma: ReturnType<typeof createPrisma>;
 let capturedEvents: QueryEvent[] = [];
 
 /**
@@ -32,11 +37,8 @@ function toSql(event: QueryEvent): string {
 
 describe('MySQL integration', () => {
   beforeAll(async () => {
-    prisma = new PrismaClient({
-      log: [{ emit: 'event', level: 'query' }],
-    });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (prisma as any).$on('query', (e: QueryEvent) => {
+    prisma = createPrisma();
+    prisma.$on('query', (e) => {
       if (!['BEGIN', 'COMMIT', 'ROLLBACK'].includes(e.query)) {
         capturedEvents.push(e);
       }

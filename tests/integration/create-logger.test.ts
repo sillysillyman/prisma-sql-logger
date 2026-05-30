@@ -2,13 +2,16 @@ import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import { PrismaClient } from '@prisma/client';
 import { createPrismaSqlLogger } from '../../src/index.js';
 
-let prisma: PrismaClient;
+const createPrisma = () =>
+  new PrismaClient({
+    log: [{ emit: 'event', level: 'query' }],
+  });
+
+let prisma: ReturnType<typeof createPrisma>;
 
 describe('createPrismaSqlLogger (end-to-end with real Prisma)', () => {
   beforeAll(async () => {
-    prisma = new PrismaClient({
-      log: [{ emit: 'event', level: 'query' }],
-    });
+    prisma = createPrisma();
   });
 
   afterAll(async () => {
@@ -25,8 +28,7 @@ describe('createPrismaSqlLogger (end-to-end with real Prisma)', () => {
       dialect: 'mysql',
       logger: (sql, meta) => captured.push({ sql, duration: meta.duration }),
     });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (prisma as any).$on('query', log);
+    prisma.$on('query', log);
 
     await prisma.typeTest.create({
       data: {
@@ -76,8 +78,7 @@ describe('createPrismaSqlLogger (end-to-end with real Prisma)', () => {
       dialect: 'mysql',
       logger: (sql) => captured.push(sql),
     });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (prisma as any).$on('query', log);
+    prisma.$on('query', log);
 
     await prisma.typeTest.findMany({ where: { str: 'exec test' } });
     await new Promise((r) => setTimeout(r, 100));
@@ -102,8 +103,7 @@ describe('createPrismaSqlLogger (end-to-end with real Prisma)', () => {
 
     try {
       const log = createPrismaSqlLogger({ dialect: 'mysql', showDuration: true });
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (prisma as any).$on('query', log);
+      prisma.$on('query', log);
 
       await prisma.typeTest.findMany();
       await new Promise((r) => setTimeout(r, 100));

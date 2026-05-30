@@ -17,8 +17,7 @@ const log = createPrismaSqlLogger({
   dialect: 'mysql',
   showDuration: true,
 });
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-(prisma as any).$on('query', log);
+prisma.$on('query', log);
 
 async function main() {
   console.log('\n--- CREATE ---');

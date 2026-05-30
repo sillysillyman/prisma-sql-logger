@@ -1,23 +1,30 @@
 import type { DialectName } from './interpolate.js';
 
 /**
- * Payload emitted by Prisma's `query` event.
+ * Subset of Prisma's `query` event payload that this library consumes.
+ *
+ * Only the fields we actually use are declared, so the handler we return
+ * is structurally assignable to Prisma's `$on('query', ...)` signature
+ * without requiring `as any` at the call site.
+ *
  * See: https://www.prisma.io/docs/orm/prisma-client/observability-and-logging/logging
  */
 export interface QueryEvent {
+  /** When the query was emitted by Prisma. */
+  timestamp: Date;
   query: string;
   /** JSON-encoded array of parameter values (not a parsed array). */
   params: string;
   /** Query execution time in milliseconds. */
   duration: number;
-  timestamp?: string;
-  target?: string;
 }
 
 /**
  * Metadata passed to a custom logger alongside the interpolated SQL.
  */
 export interface LogMeta {
+  /** When the query was emitted by Prisma (useful for log correlation). */
+  timestamp: Date;
   /** Query execution time in milliseconds. */
   duration: number;
 }

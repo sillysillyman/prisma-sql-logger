@@ -38,7 +38,7 @@ export function createPrismaSqlLogger(
     const sql = interpolate(event.query, params, dialect);
 
     if (logger) {
-      logger(sql, { duration: event.duration });
+      logger(sql, { timestamp: event.timestamp, duration: event.duration });
     } else {
       defaultLogger(sql, event.duration);
     }
