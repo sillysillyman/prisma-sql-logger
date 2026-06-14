@@ -54,6 +54,8 @@ export const postgresql: Dialect = {
       return `${quoteString(JSON.stringify(value))}::jsonb`;
     }
 
-    return quoteString(String(value));
+    // Fallback for any remaining primitive (e.g. symbol). Objects are handled
+    // above, so the cast is safe and keeps formatValue total.
+    return quoteString(String(value as string | number | bigint | boolean | symbol));
   },
 };
