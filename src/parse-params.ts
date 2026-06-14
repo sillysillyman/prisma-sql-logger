@@ -20,16 +20,13 @@ export function parseParams(paramsStr: string): unknown[] {
   //    Match bare integer literals (not inside quotes, not floats) that exceed MAX_SAFE_INTEGER
   //    and wrap them in quotes with a __bigint: marker so we can convert them back after JSON.parse.
   const BIGINT_MARKER = '__bigint:';
-  s = s.replace(
-    /(?<=[[\s,:])-?(\d{16,})(?=[,\]\s}])/g,
-    (match) => {
-      const n = BigInt(match);
-      if (n > BigInt(Number.MAX_SAFE_INTEGER) || n < BigInt(-Number.MAX_SAFE_INTEGER)) {
-        return `"${BIGINT_MARKER}${match}"`;
-      }
-      return match;
-    },
-  );
+  s = s.replace(/(?<=[[\s,:])-?(\d{16,})(?=[,\]\s}])/g, (match) => {
+    const n = BigInt(match);
+    if (n > BigInt(Number.MAX_SAFE_INTEGER) || n < BigInt(-Number.MAX_SAFE_INTEGER)) {
+      return `"${BIGINT_MARKER}${match}"`;
+    }
+    return match;
+  });
 
   const parsed = JSON.parse(s) as unknown[];
 

@@ -83,9 +83,7 @@ describe('createPrismaSqlLogger (end-to-end with real Prisma)', () => {
     await prisma.typeTest.findMany({ where: { str: 'exec test' } });
     await new Promise((r) => setTimeout(r, 100));
 
-    const selectSql = captured.find(
-      (s) => s.startsWith('SELECT') && s.includes("'exec test'"),
-    );
+    const selectSql = captured.find((s) => s.startsWith('SELECT') && s.includes("'exec test'"));
     expect(selectSql).toBeDefined();
 
     // Re-execute the logged SQL as raw and expect the same result shape

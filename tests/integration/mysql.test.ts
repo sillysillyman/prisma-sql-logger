@@ -72,9 +72,7 @@ describe('MySQL integration', () => {
     });
 
     it('uses ? placeholders for MySQL', async () => {
-      const events = await captureQueries(() =>
-        prisma.typeTest.findMany({ where: { id: 999 } }),
-      );
+      const events = await captureQueries(() => prisma.typeTest.findMany({ where: { id: 999 } }));
 
       const selectEvent = events.find((e) => e.query.includes('WHERE'));
       expect(selectEvent).toBeDefined();
@@ -129,9 +127,7 @@ describe('MySQL integration', () => {
         },
       });
 
-      const events = await captureQueries(() =>
-        prisma.typeTest.findMany({ where: { num: 42 } }),
-      );
+      const events = await captureQueries(() => prisma.typeTest.findMany({ where: { num: 42 } }));
       const selectEvent = events.find((e) => e.query.includes('WHERE'))!;
       const sql = toSql(selectEvent);
 
@@ -347,9 +343,7 @@ describe('MySQL integration', () => {
         });
       }
 
-      const events = await captureQueries(() =>
-        prisma.typeTest.findMany({ take: 2, skip: 1 }),
-      );
+      const events = await captureQueries(() => prisma.typeTest.findMany({ take: 2, skip: 1 }));
       const selectEvent = events.find((e) => e.query.includes('LIMIT'))!;
       const sql = toSql(selectEvent);
 
@@ -659,9 +653,10 @@ describe('MySQL integration', () => {
 
       // Verify customer data from the first query
       const customerEvent = events.find((e) => e.query.includes('`Customer`'))!;
-      const replayedCustomers = (await prisma.$queryRawUnsafe(
-        toSql(customerEvent),
-      )) as Record<string, unknown>[];
+      const replayedCustomers = (await prisma.$queryRawUnsafe(toSql(customerEvent))) as Record<
+        string,
+        unknown
+      >[];
       expect(replayedCustomers[0]!['name']).toBe(original!.name);
       expect(replayedCustomers[0]!['email']).toBe(original!.email);
     });
