@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import { PrismaClient } from '@prisma/client';
-import { createPrismaSqlLogger } from '../../src/index.js';
+import { createPrismaSqlLogger } from '../../../src/index.js';
 
 const createPrisma = () =>
   new PrismaClient({
