@@ -93,7 +93,9 @@ export function findSelectMatching(
     const sql = toSql(event, dialect);
     if (predicate(sql)) return { event, sql };
   }
-  expect.fail(`No SELECT event matched the predicate. Got: ${events.map((e) => e.query).join('\n')}`);
+  expect.fail(
+    `No SELECT event matched the predicate. Got: ${events.map((e) => e.query).join('\n')}`,
+  );
 }
 
 /**

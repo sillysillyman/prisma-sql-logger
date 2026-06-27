@@ -82,11 +82,7 @@ describe('MySQL filter — comparison operators', () => {
 
   it('lt', async () => {
     await prisma.typeTest.createMany({
-      data: [
-        baseTypeTest({ num: 5 }),
-        baseTypeTest({ num: 10 }),
-        baseTypeTest({ num: 15 }),
-      ],
+      data: [baseTypeTest({ num: 5 }), baseTypeTest({ num: 10 }), baseTypeTest({ num: 15 })],
     });
     const events = await captureQueries(() =>
       prisma.typeTest.findMany({ where: { num: { lt: 10 } } }),
@@ -99,11 +95,7 @@ describe('MySQL filter — comparison operators', () => {
 
   it('lte', async () => {
     await prisma.typeTest.createMany({
-      data: [
-        baseTypeTest({ num: 5 }),
-        baseTypeTest({ num: 10 }),
-        baseTypeTest({ num: 15 }),
-      ],
+      data: [baseTypeTest({ num: 5 }), baseTypeTest({ num: 10 }), baseTypeTest({ num: 15 })],
     });
     const events = await captureQueries(() =>
       prisma.typeTest.findMany({ where: { num: { lte: 10 } } }),
@@ -116,11 +108,7 @@ describe('MySQL filter — comparison operators', () => {
 
   it('gt', async () => {
     await prisma.typeTest.createMany({
-      data: [
-        baseTypeTest({ num: 5 }),
-        baseTypeTest({ num: 10 }),
-        baseTypeTest({ num: 15 }),
-      ],
+      data: [baseTypeTest({ num: 5 }), baseTypeTest({ num: 10 }), baseTypeTest({ num: 15 })],
     });
     const events = await captureQueries(() =>
       prisma.typeTest.findMany({ where: { num: { gt: 10 } } }),

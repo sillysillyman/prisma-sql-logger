@@ -44,9 +44,7 @@ describe('PostgreSQL CRUD — additional operations', () => {
         prisma.customer.findUnique({ where: { id: created.id } }),
       );
 
-      const { sql } = findSelectMatching(events, DIALECT, (s) =>
-        s.includes(`= ${created.id}`),
-      );
+      const { sql } = findSelectMatching(events, DIALECT, (s) => s.includes(`= ${created.id}`));
 
       const replayed = (await prisma.$queryRawUnsafe(sql)) as Record<string, unknown>[];
       expect(replayed).toHaveLength(1);
@@ -81,9 +79,7 @@ describe('PostgreSQL CRUD — additional operations', () => {
         prisma.customer.findUniqueOrThrow({ where: { id: created.id } }),
       );
 
-      const { sql } = findSelectMatching(events, DIALECT, (s) =>
-        s.includes(`= ${created.id}`),
-      );
+      const { sql } = findSelectMatching(events, DIALECT, (s) => s.includes(`= ${created.id}`));
       const replayed = (await prisma.$queryRawUnsafe(sql)) as unknown[];
       expect(replayed).toHaveLength(1);
     });
@@ -97,9 +93,7 @@ describe('PostgreSQL CRUD — additional operations', () => {
         prisma.customer.findFirstOrThrow({ where: { name: 'firstorthrow' } }),
       );
 
-      const { sql } = findSelectMatching(events, DIALECT, (s) =>
-        s.includes("'firstorthrow'"),
-      );
+      const { sql } = findSelectMatching(events, DIALECT, (s) => s.includes("'firstorthrow'"));
       const replayed = (await prisma.$queryRawUnsafe(sql)) as unknown[];
       expect(replayed).toHaveLength(1);
     });
